@@ -29,7 +29,7 @@ function scanRes(res, depth, seen) {
     const r = v.resolve();
     const st = r.get("Subtype").asName();
     if (st === "Image") images.push({ k, num, w: r.get("Width").asNumber(), h: r.get("Height").asNumber(), cs: r.get("ColorSpace").toString().slice(0, 40), bpc: r.get("BitsPerComponent").toString(), filter: r.get("Filter").toString(), smask: !r.get("SMask").isNull(), mask: r.get("ImageMask").toString() });
-    else if (st === "Form") { const s = r.readStream().asString(); count(s); scanRes(r.get("Resources"), depth + 1, seen); }
+    else if (st === "Form") { const s = v.readStream().asString(); count(s); scanRes(r.get("Resources"), depth + 1, seen); }
   });
 }
 function count(s) {

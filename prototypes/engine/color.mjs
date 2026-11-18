@@ -130,5 +130,15 @@ export function createMapper(theme, opts = {}) {
     return r;
   }
 
-  return { bg, text, bgL, textL, T, mapPaint, mapText, ensureContrast };
+  /**
+   * Large filled areas ("surfaces"). Surfaces that are already dark (cards, banners with light
+   * text) stay as designed; light surfaces are mapped like any paint.
+   */
+  function mapSurface(rgb) {
+    const L = rgbToOklab(rgb)[0];
+    if (L < (opts.darkSurfaceL ?? 0.45)) return rgb;
+    return mapPaint(rgb);
+  }
+
+  return { bg, text, bgL, textL, T, mapPaint, mapText, mapSurface, ensureContrast };
 }

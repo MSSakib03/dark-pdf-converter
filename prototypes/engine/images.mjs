@@ -19,6 +19,8 @@ export function buildLut(mapper, N = 33) {
 
 function lutApply({ lut, N }, r, g, b, out, o) {
   const s = (N - 1) / 255;
+  // guard: callers may pass slightly out-of-range values
+  r = r < 0 ? 0 : r > 255 ? 255 : r; g = g < 0 ? 0 : g > 255 ? 255 : g; b = b < 0 ? 0 : b > 255 ? 255 : b;
   const fr = r * s, fg = g * s, fb = b * s;
   const r0 = Math.min(N - 2, fr | 0), g0 = Math.min(N - 2, fg | 0), b0 = Math.min(N - 2, fb | 0);
   const dr = fr - r0, dg = fg - g0, db = fb - b0;
@@ -114,6 +116,7 @@ export function classify(px, w, h, nc) {
  */
 export function transform(px, w, h, nc, cls, lut, opts = {}) {
   const tmp = [0, 0, 0];
+  const before = downscale(px, w, h, nc, 256); // small copy of the original for backdrop sampling
   if (cls === "diagram") {
     for (let i = 0; i < w * h * nc; i += nc) { lutApply(lut, px[i], px[i + 1], px[i + 2], tmp, 0); px[i] = tmp[0]; px[i + 1] = tmp[1]; px[i + 2] = tmp[2]; }
   } else if (cls === "photo-on-paper") {
@@ -146,15 +149,20 @@ export function transform(px, w, h, nc, cls, lut, opts = {}) {
   } else if (opts.photoDim && opts.photoDim < 1) {
     for (let i = 0; i < w * h * nc; i += nc) { px[i] *= opts.photoDim; px[i + 1] *= opts.photoDim; px[i + 2] *= opts.photoDim; }
   }
+  const after = downscale(px, w, h, nc, 256);
+  const { W, H } = before;
+  // Sampler: average colour (3x3 on the small grid) after transformation, plus whether it changed.
   return (u, v) => {
-    // 5x5 average around the point
-    const cx = Math.round(u * (w - 1)), cy = Math.round(v * (h - 1));
-    let r = 0, g = 0, b = 0, c = 0;
-    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
-      const x = Math.min(w - 1, Math.max(0, cx + dx * 2)), y = Math.min(h - 1, Math.max(0, cy + dy * 2));
-      const i = (y * w + x) * nc; r += px[i]; g += px[i + 1]; b += px[i + 2]; c++;
+    const cx = Math.round(Math.min(1, Math.max(0, u)) * (W - 1)), cy = Math.round(Math.min(1, Math.max(0, v)) * (H - 1));
+    let r = 0, g = 0, b = 0, d = 0, c = 0;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const x = Math.min(W - 1, Math.max(0, cx + dx)), y = Math.min(H - 1, Math.max(0, cy + dy));
+      const j = (y * W + x) * 3;
+      r += after.small[j]; g += after.small[j + 1]; b += after.small[j + 2];
+      d += Math.abs(after.small[j] - before.small[j]) + Math.abs(after.small[j + 1] - before.small[j + 1]) + Math.abs(after.small[j + 2] - before.small[j + 2]);
+      c++;
     }
-    return [r / c / 255, g / c / 255, b / c / 255];
+    return { color: [r / c / 255, g / c / 255, b / c / 255], changed: d / c / 3 / 255 > 0.12 };
   };
 }
 
@@ -218,4 +226,4 @@ function bilinear(a, W, H, x, y) {
   const x0 = x | 0, y0 = y | 0, x1 = Math.min(W - 1, x0 + 1), y1 = Math.min(H - 1, y0 + 1), dx = x - x0, dy = y - y0;
   return (a[y0 * W + x0] * (1 - dx) + a[y0 * W + x1] * dx) * (1 - dy) + (a[y1 * W + x0] * (1 - dx) + a[y1 * W + x1] * dx) * dy;
 }
-export const _internal = { downscale, paperMask, morph, keepTexturedComponents };
+export const _internal = { downscale, paperMask, morph, keepTexturedComponents, lutApply };

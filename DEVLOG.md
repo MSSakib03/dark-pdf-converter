@@ -66,7 +66,42 @@ inside illustrations stay white (Word-like behaviour).
   DrawingML, theme colours, page background and embedded images. Layout untouched.
   Verified by rendering with desktop LibreOffice: correct. Microsoft Word verification pending (user).
 
+### Stage 0, round 2 — more samples (handbook, two scanned books)
+
+New engine capabilities:
+
+- **Shading / gradient remap:** axial and radial shadings (Function type 2 and stitching type 3) get a
+  remapped copy; text gradients are contrast-checked, gradients over photos are kept.
+- **Path buffering:** colour operators are now emitted before path construction (PDF-spec compliant).
+- **Already-dark pages** (>50% dark pixels in a 20 dpi render) are left untouched (QR codes stay scannable).
+- **Dark surfaces:** a two-pass analysis finds dark containers that carry light text (cards, banners);
+  they keep their colour. Logos and icons without text on them are still mapped.
+- **Text over unchanged content** (photos, overlays) keeps its designed colour.
+- **Scanned-page pipeline** (`engine/scan.mjs`): paper/illumination map -> normalisation -> soft ink
+  mask (removes bleed-through) -> theme LUT. Coloured inks (stamps, red handwriting) keep their hue.
+  Picture pages (covers: large photo area or coloured paper) are kept and dimmed.
+- **Scan vs. digital artwork:** a page is treated as a scan only if it is image-only *and* its paper is
+  not pure white (90th percentile luminance < 0.975).
+
+Regression set (Node, single thread):
+
+| Sample | Pages | Time | Size | Text identical | Links | Notes |
+|---|---|---|---|---|---|---|
+| ch9 (Word export) | 14 | 1.6 s | 839 -> 875 KB | 14/14 | 14/14 | |
+| atlas (image-heavy, Bangla) | 11 | 18.7 s | 8.6 -> 9.2 MB | 11/11 | 11/11 | |
+| handbook (Chrome/Skia, Bangla) | 8 | 2.6 s | 2.2 -> 2.4 MB | 8/8 | 8/8 | 2 dark pages kept, 101 gradients remapped |
+| scanned book 1 | 10 | 13.6 s | 8.7 -> 5.1 MB | 10/10 | 10/10 | cover kept as picture page |
+| scanned book 2 | 16 | 19.2 s | 11.3 -> 7.4 MB | 16/16 | 16/16 | green cover kept |
+
+DOCX -> Dark DOCX was verified in Microsoft Word by the project owner: correct.
+
+Known issues after round 2:
+
+- Faint speckles where bleed-through was strongest (needs a small despeckle on the ink mask).
+- Low-contrast halftone photos inside text pages are only partly detected; picture-page fallback is
+  page-level. A per-page override (Auto / Keep / Invert) will be exposed in the UI.
+
 ### Not yet covered
 
-- True scanned PDFs (no sample yet), shading/gradient remap, annotation appearance streams,
-  transparency groups / blend modes, Type3 glyph colours, mobile performance measurement.
+- Annotation appearance streams, transparency groups / blend modes, Type3 glyph colours,
+  tiling patterns, sampled-function shadings, mobile performance measurement.
