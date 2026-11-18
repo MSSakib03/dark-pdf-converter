@@ -1,0 +1,21 @@
+{
+  "name": "dark-pdf-converter",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Privacy-first, in-browser converter that turns PDF and DOCX documents into readable Dark Mode.",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MSSakib03/dark-pdf-converter.git"
+  },
+  "homepage": "https://github.com/MSSakib03/dark-pdf-converter#readme",
+  "scripts": {
+    "proto:pdf": "node prototypes/convert.mjs",
+    "proto:docx": "node prototypes/docx_dark.mjs"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2",
+    "mupdf": "^1.28.6"
+  }
+}
