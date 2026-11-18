@@ -64,7 +64,7 @@ inside illustrations stay white (Word-like behaviour).
 - LibreOffice WASM (ZetaOffice) is reported at ~300 MB download: **not viable** for a free, mobile-friendly site.
 - **DOCX -> Dark DOCX** (`prototypes/docx_dark.mjs`): recolours run colours, shading, borders, highlights,
   DrawingML, theme colours, page background and embedded images. Layout untouched.
-  Verified by rendering with desktop LibreOffice: correct. Microsoft Word verification pending (user).
+  Verified by rendering with desktop LibreOffice and in Microsoft Word (project owner): correct.
 
 ### Stage 0, round 2 — more samples (handbook, two scanned books)
 
