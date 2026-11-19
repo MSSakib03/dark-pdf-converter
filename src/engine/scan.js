@@ -8,8 +8,8 @@
 //   4. Compose through the theme LUT (dark paper, light ink, colours lifted).
 //   5. Photo regions (large, textured, after opening) keep their pixels (slightly dimmed).
 
-import { rgbToOklab } from "./color.mjs";
-import { _internal as I } from "./images.mjs";
+import { rgbToOklab } from "./color.js";
+import { _internal as I } from "./images.js";
 
 const clamp = (x, a, b) => (x < a ? a : x > b ? b : x);
 const smooth = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };

@@ -105,3 +105,19 @@ Known issues after round 2:
 
 - Annotation appearance streams, transparency groups / blend modes, Type3 glyph colours,
   tiling patterns, sampled-function shadings, mobile performance measurement.
+
+## Stage 1 — Browser app (2026-11-19)
+
+- Engine moved to `src/engine/` and shared by the web app, the CLI (`tools/cli.mjs`) and the regression
+  check (`tools/regress.mjs`).
+- `convertPdf()` / `convertDocx()` are environment-agnostic (MuPDF module passed in), with progress callbacks,
+  password handling, signature/repair warnings and a per-page report.
+- **Memory:** WASM objects (pages, pixmaps, images, buffers, documents) are now freed explicitly. Before this,
+  converting several large files in one process ran out of WASM memory; now all samples pass in one run.
+- Web app: Vite + React + TypeScript + Tailwind. Two Web Workers (conversion, preview rendering) so the UI never
+  blocks. The conversion worker signals `ready` after loading the WASM module; messages are only posted after
+  that (messages sent during module loading were being lost).
+- Features: drag-and-drop / multi-file, 15 themes + custom colours with live contrast ratio, image mode
+  (Smart / Keep original), progress, cancel, password prompt, before/after slider with page navigation,
+  per-file download and ZIP download, responsive layout (phone / tablet / desktop).
+- GitHub Pages deployment via `.github/workflows/deploy.yml` (push to `main`).

@@ -11,11 +11,26 @@
   },
   "homepage": "https://github.com/MSSakib03/dark-pdf-converter#readme",
   "scripts": {
-    "proto:pdf": "node prototypes/convert.mjs",
-    "proto:docx": "node prototypes/docx_dark.mjs"
+    "dev": "vite",
+    "build": "tsc --noEmit -p . && vite build",
+    "preview": "vite preview",
+    "regress": "node tools/regress.mjs",
+    "convert": "node tools/cli.mjs"
   },
   "dependencies": {
-    "fflate": "^0.8.2",
-    "mupdf": "^1.28.6"
+    "fflate": "0.8.2",
+    "mupdf": "1.28.6",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.5",
+    "@types/node": "22.15.30",
+    "@types/react": "18.3.23",
+    "@types/react-dom": "18.3.7",
+    "@vitejs/plugin-react": "4.7.0",
+    "tailwindcss": "4.3.5",
+    "typescript": "5.9.3",
+    "vite": "6.4.6"
   }
 }

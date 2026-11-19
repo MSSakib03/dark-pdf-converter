@@ -1,6 +1,6 @@
 // Debug helper: dump paper / opened / solid masks of one image XObject as PNG.
 import * as mupdf from "mupdf"; import fs from "node:fs";
-import { _internal as I } from "./engine/images.mjs";
+import { _internal as I } from "../src/engine/images.js";
 const [, , file, objNum, outPrefix] = process.argv;
 const doc = new mupdf.PDFDocument(fs.readFileSync(file));
 const img = doc.loadImage(doc.newIndirect(+objNum));

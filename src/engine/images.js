@@ -4,7 +4,7 @@
 //                        -> remap only the border-connected paper region (soft mask), keep the photo
 //  - "photo": natural image                           -> keep (optionally dimmed)
 
-import { rgbToOklab } from "./color.mjs";
+import { rgbToOklab } from "./color.js";
 
 /** 3D LUT (N^3) of mapper.mapPaint for fast per-pixel mapping with trilinear interpolation. */
 export function buildLut(mapper, N = 33) {

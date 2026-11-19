@@ -8,7 +8,7 @@
 // A lightweight backdrop model (filled shapes, images, pattern areas in device space) lets text
 // be mapped against what is really underneath it.
 
-import { tokenize, serialize, num } from "./tokenizer.mjs";
+import { tokenize, serialize, num } from "./tokenizer.js";
 
 const IDENT = [1, 0, 0, 1, 0, 0];
 const mul = (a, b) => [

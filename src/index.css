@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+:root { color-scheme: dark; }
+html, body { background: #111214; color: #e7e7ea; }
+body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Bengali", sans-serif; -webkit-tap-highlight-color: transparent; }
+
+@layer components {
+  .card { @apply rounded-2xl bg-[#17181c] ring-1 ring-white/[0.06] p-4 sm:p-5; }
+  .section-title { @apply text-sm font-semibold text-zinc-200; }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-amber-300 text-black font-semibold text-sm px-4 h-11 hover:bg-amber-200 active:scale-[.98] transition disabled:opacity-40 disabled:pointer-events-none; }
+  .btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 text-zinc-100 font-medium text-sm px-4 h-11 hover:bg-white/15 transition; }
+  .btn-ghost { @apply inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-zinc-300 hover:bg-white/5; }
+  .btn-icon { @apply grid place-items-center size-10 rounded-lg hover:bg-white/5 disabled:opacity-30; }
+  .swatch { @apply relative grid place-items-center aspect-square rounded-xl transition min-h-11; }
+  .seg { @apply grid grid-cols-2 rounded-xl bg-white/[0.04] p-1; }
+  .seg > button { @apply h-9 rounded-lg text-sm text-zinc-400; }
+  .seg > button.on { @apply bg-white/10 text-white font-medium; }
+  .field { @apply flex items-center justify-between gap-2 rounded-xl bg-white/[0.04] px-3 h-11 text-sm text-zinc-300; }
+  .field input[type="color"] { @apply size-7 rounded-md bg-transparent border-0 p-0 cursor-pointer; }
+  .input { @apply rounded-lg bg-black/30 ring-1 ring-white/10 px-3 h-10 text-sm outline-none focus:ring-amber-300; }
+}
+:focus-visible { outline: 2px solid #fcd34d; outline-offset: 2px; }
