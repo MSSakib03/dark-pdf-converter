@@ -12,7 +12,7 @@ export function Compare({ before, after, ratio }: { before: string; after: strin
     <div
       ref={ref}
       className="relative mx-auto select-none touch-none rounded shadow-2xl overflow-hidden"
-      style={{ aspectRatio: `1 / ${ratio}`, maxWidth: `min(100%, calc(78vh / ${ratio}))` }}
+      style={{ aspectRatio: `1 / ${ratio}`, maxWidth: `min(100%, calc((100dvh - 11rem) / ${ratio}))` }}
       onPointerDown={(e) => { (e.target as HTMLElement).setPointerCapture?.(e.pointerId); move(e.clientX); }}
       onPointerMove={(e) => { if (e.buttons) move(e.clientX); }}
     >

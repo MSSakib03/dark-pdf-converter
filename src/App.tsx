@@ -205,7 +205,7 @@ export default function App() {
           )}
         </section>
 
-        <section className="min-w-0">
+        <section className="min-w-0 lg:sticky lg:top-[4.75rem] lg:self-start">
           <Preview job={selectedJob} renderer={render.current} />
         </section>
       </main>
@@ -271,6 +271,7 @@ function FileRow({ job, active, outdated, onSelect, onRemove, onPassword }: {
 function Preview({ job, renderer }: { job: Job | null; renderer: RenderClient | null }) {
   const [page, setPage] = useState(0);
   const [count, setCount] = useState(0);
+  const [openedKey, setOpenedKey] = useState(""); // set once the documents are open in the worker
   const [imgs, setImgs] = useState<{ a?: string; b?: string; ratio?: number }>({});
   const [err, setErr] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -283,15 +284,14 @@ function Preview({ job, renderer }: { job: Job | null; renderer: RenderClient | 
   useEffect(() => {
     let alive = true;
     setErr(null);
-    setImgs({});
+    setOpenedKey("");
     if (!job || !renderer || isDocx(job.file) || job.status === "password") return;
     (async () => {
       try {
         const { pageCount } = await renderer.open(keyA, await job.file.arrayBuffer(), job.password);
-        if (alive) setCount(pageCount);
         if (job.result && job.result.kind === "pdf") await renderer.open(keyB, job.result.output);
-        if (alive) setImgs({}); // trigger render
-      } catch (e) { if (alive) setErr("This file cannot be previewed."); }
+        if (alive) { setCount(pageCount); setOpenedKey(keyA + "|" + keyB); }
+      } catch { if (alive) setErr("This file cannot be previewed."); }
     })();
     return () => { alive = false; };
   }, [job?.id, keyB, job?.status, renderer]);
@@ -300,7 +300,7 @@ function Preview({ job, renderer }: { job: Job | null; renderer: RenderClient | 
   useEffect(() => {
     let alive = true;
     const urls: string[] = [];
-    if (!job || !renderer || isDocx(job.file) || !count) return;
+    if (!job || !renderer || isDocx(job.file) || !count || openedKey !== keyA + "|" + keyB) return;
     const width = Math.min(1800, Math.round((box.current?.clientWidth ?? 800) * Math.min(2, window.devicePixelRatio || 1)));
     (async () => {
       try {
@@ -309,10 +309,10 @@ function Preview({ job, renderer }: { job: Job | null; renderer: RenderClient | 
         let ub: string | undefined;
         if (keyB) { const b = await renderer.render(keyB, page, width); ub = URL.createObjectURL(new Blob([b.png], { type: "image/png" })); urls.push(ub); }
         if (alive) setImgs({ a: ua, b: ub, ratio: a.height / a.width });
-      } catch { /* document not ready yet */ }
+      } catch { if (alive) setErr("This page could not be rendered."); }
     })();
     return () => { alive = false; setTimeout(() => urls.forEach((u) => URL.revokeObjectURL(u)), 1000); };
-  }, [job?.id, keyB, page, count, renderer]);
+  }, [openedKey, page, count, renderer]);
 
   if (!job) {
     return (
